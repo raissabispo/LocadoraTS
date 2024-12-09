@@ -1,7 +1,7 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
 import { config, dialect } from "../config/db.config"
-import { Genero } from "../models/Genero"
+import { Genero } from "../model/Genero"
 
 export const AppDataSource = new DataSource({
     type: dialect,

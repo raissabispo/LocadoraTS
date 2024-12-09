@@ -1,21 +1,21 @@
 import { AppDataSource } from "../db/data-source";
-import { Genero } from "../models/Genero";
+import { Genero } from "../model/Genero";
 
 class GeneroRepository {
     generoRepository = AppDataSource.getRepository(Genero);
 
     async save(genero: Genero): Promise<Genero> {
         try {
-            // insert into genero value (genero.idGenero, genero.nome);
-            this.generoRepository.save(genero);
+            await this.generoRepository.save(genero); // Aguardando a operação assíncrona
             return genero;
         } catch (err) {
             throw new Error("Falha ao criar o gênero!");
         }
     }
+
     async retrieveAll(): Promise<Array<Genero>> {
         try {
-            return this.generoRepository.find();
+            return await this.generoRepository.find(); // Aguardando a operação assíncrona
         } catch (error) {
             throw new Error("Falha ao retornar os gêneros!");
         }
@@ -23,9 +23,9 @@ class GeneroRepository {
 
     async retrieveById(generoId: number): Promise<Genero | null> {
         try {
-            return this.generoRepository.findOneBy({
+            return await this.generoRepository.findOneBy({
                 idGenero: generoId,
-            });
+            }); // Aguardando a operação assíncrona
         } catch (error) {
             throw new Error("Falha ao buscar o gênero!");
         }
@@ -33,18 +33,18 @@ class GeneroRepository {
 
     async retrieveByNome(n: string): Promise<Genero | null> {
         try {
-            return this.generoRepository.findOneBy({
-                nome: n,
-            });
+            return await this.generoRepository.findOneBy({
+                genero: n, // Atualizando para "genero" ao invés de "nome"
+            }); // Aguardando a operação assíncrona
         } catch (error) {
             throw new Error("Falha ao buscar o gênero!");
         }
     }
 
     async update(genero: Genero) {
-        const { idGenero, nome } = genero;
+        const { idGenero, genero: nomeGenero } = genero; // Alterando para "genero"
         try {
-            this.generoRepository.save(genero);
+            await this.generoRepository.save(genero); // Aguardando a operação assíncrona
         } catch (error) {
             throw new Error("Falha ao atualizar o gênero!");
         }
@@ -54,9 +54,9 @@ class GeneroRepository {
         try {
             const generoEncontrado = await this.generoRepository.findOneBy({
                 idGenero: generoId,
-            });
+            }); // Aguardando a operação assíncrona
             if (generoEncontrado) {
-                this.generoRepository.remove(generoEncontrado);
+                await this.generoRepository.remove(generoEncontrado); // Aguardando a operação assíncrona
                 return 1;
             }
             return 0;
@@ -67,9 +67,9 @@ class GeneroRepository {
 
     async deleteAll(): Promise<number> {
         try {
-            let num = this.generoRepository.query("select count(idGenero) from genero;");
-            this.generoRepository.query("delete from genero;");
-            return num;
+            const result = await this.generoRepository.query("SELECT COUNT(idGenero) FROM genero;");
+            await this.generoRepository.query("DELETE FROM genero;");
+            return result[0]['COUNT(idGenero)']; // Aguardando a operação assíncrona
         } catch (error) {
             throw new Error("Falha ao deletar todos os gêneros!");
         }
